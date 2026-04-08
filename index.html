@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>КАЗИНО 777 · СТАВКИ-ЛАВКИ</title>
-  <!-- Роскошные шрифты -->
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Montserrat:wght@300;400;600;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
@@ -24,7 +23,7 @@
       color: #f0e6d2;
     }
     .casino-app {
-      max-width: 1400px;
+      max-width: 1500px;
       width: 100%;
       background: rgba(6, 4, 10, 0.8);
       backdrop-filter: blur(25px) saturate(200%);
@@ -35,7 +34,6 @@
       overflow: hidden;
       padding: 0 28px 28px;
     }
-    /* Шапка */
     .app-header {
       display: flex;
       align-items: center;
@@ -111,7 +109,6 @@
       box-shadow: 0 0 18px #d4af37;
     }
     .btn-gold:hover { transform: translateY(2px); box-shadow: 0 2px 0 #0a070e; }
-    /* Вкладки */
     .tabs-container {
       display: flex;
       gap: 8px;
@@ -144,7 +141,6 @@
     }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
-    /* Главная */
     .hero-grid {
       display: grid;
       grid-template-columns: 1.2fr 1fr;
@@ -178,28 +174,40 @@
     }
     .jackpot-label { font-size: 22px; letter-spacing: 6px; color: #ebd194; }
     .jackpot-number { font-size: 64px; font-weight: 900; background: linear-gradient(180deg, #ffefb0, #d4af37); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: 0 0 40px #ffd966; }
-    /* Лидерборд */
     .leaderboard {
       background: #0f0b14;
       border-radius: 32px;
       padding: 24px;
       border: 1px solid #d4af37;
+      max-height: 500px;
+      overflow-y: auto;
     }
-    .leaderboard h3 { color: #d4af37; margin-bottom: 20px; font-size: 26px; }
-    .leaderboard-list { display: flex; flex-direction: column; gap: 12px; }
+    .leaderboard h3 { color: #d4af37; margin-bottom: 20px; font-size: 26px; display: flex; justify-content: space-between; }
+    .leaderboard-list { display: flex; flex-direction: column; gap: 8px; }
     .leader-item {
       display: flex;
       align-items: center;
       justify-content: space-between;
       background: #1a1320;
-      padding: 12px 20px;
+      padding: 10px 18px;
       border-radius: 28px;
       border: 1px solid #b4945060;
+      transition: all 0.2s;
     }
     .player-name i { color: #d4af37; margin-right: 10px; }
     .player-win { font-weight: 700; color: #ebd194; }
     .highlight-player { background: #2a1f30; border: 1px solid #d4af37; box-shadow: 0 0 10px #d4af37; }
-    /* Слоты */
+    .live-feed {
+      margin-top: 20px;
+      background: #0a070e;
+      border-radius: 28px;
+      padding: 14px 20px;
+      border: 1px solid #d4af37;
+      color: #d4af37;
+      font-weight: 600;
+      overflow: hidden;
+      white-space: nowrap;
+    }
     .slot-premium {
       background: #0e0a12;
       border-radius: 48px;
@@ -255,7 +263,6 @@
       border: 1px solid #fff0b0;
       color: #0e0a14;
     }
-    /* Лавка */
     .shop-grid {
       display: grid;
       grid-template-columns: repeat(3,1fr);
@@ -270,7 +277,6 @@
       box-shadow: inset 0 0 15px #000, 0 10px 0 #07050a;
       text-align: center;
     }
-    /* Модалка входа */
     .modal {
       position: fixed; top:0; left:0; width:100%; height:100%;
       background: rgba(0,0,0,0.85); backdrop-filter: blur(12px);
@@ -284,11 +290,11 @@
       width: 100%; padding: 16px; margin-bottom: 20px; border-radius: 40px;
       border: 2px solid #d4af37; background: #0e0a14; color: white; font-size: 18px;
     }
+    .online-counter { color: #2ecc71; }
   </style>
 </head>
 <body>
 <div class="casino-app">
-  <!-- ХЕДЕР (без демо) -->
   <div class="app-header">
     <div class="logo-area">
       <i class="fas fa-crown logo-icon"></i>
@@ -307,7 +313,6 @@
     </div>
   </div>
 
-  <!-- ВКЛАДКИ -->
   <div class="tabs-container">
     <button class="tab-btn active" data-tab="home"><i class="fas fa-home"></i> ГЛАВНАЯ</button>
     <button class="tab-btn" data-tab="slots"><i class="fas fa-gamepad"></i> СЛОТЫ</button>
@@ -329,17 +334,13 @@
           <button class="btn-gold solid" style="flex:1;" id="playNowHome"><i class="fas fa-play"></i> ИГРАТЬ</button>
           <button class="btn-gold" style="flex:1;" id="depositBtn"><i class="fas fa-plus-circle"></i> ПОПОЛНИТЬ</button>
         </div>
+        <div class="live-feed" id="liveFeed">🎰 BIGWIN: Player777 сорвал 1,250,000 ₽!</div>
       </div>
       <div class="leaderboard">
-        <h3><i class="fas fa-trophy"></i> ТОП ИГРОКОВ СЕГОДНЯ</h3>
+        <h3><i class="fas fa-trophy"></i> ТОП ИГРОКОВ <span style="font-size:16px;"><i class="fas fa-sync-alt fa-spin" id="refreshIcon"></i> онлайн 2,847</span></h3>
         <div class="leaderboard-list" id="leaderboardContainer"></div>
         <p style="margin-top: 20px; color:#a58e62; text-align:center;"><i class="fas fa-chevron-right"></i> Ваше место: <span id="playerRank">—</span></p>
       </div>
-    </div>
-    <!-- Онлайн игроки -->
-    <div style="display: flex; gap: 10px; margin-top: 16px; justify-content: center;">
-      <span style="color:#d4af37;"><i class="fas fa-circle" style="color:#2ecc71;"></i> Онлайн: 2,847 игроков</span>
-      <span style="color:#d4af37;"><i class="fas fa-gem"></i> Последний выигрыш: <span id="lastWinAmount">125,000</span> ₽</span>
     </div>
   </div>
 
@@ -384,7 +385,7 @@
   </div>
 </div>
 
-<!-- МОДАЛКА ВХОДА (реалистичная) -->
+<!-- МОДАЛКА ВХОДА -->
 <div class="modal" id="authModal">
   <div class="modal-content">
     <h3 style="color:#d4af37; margin-bottom:24px; font-size:28px;"><i class="fas fa-crown"></i> ВХОД</h3>
@@ -397,7 +398,7 @@
 
 <script>
   (function(){
-    // ---------- СОСТОЯНИЕ (реалистичное) ----------
+    // ---------- СОСТОЯНИЕ ----------
     let balance = 12450;
     let jackpot = 8432150;
     let bet = 10;
@@ -406,17 +407,38 @@
     let multiplierActive = false;
     let currentUser = { name: 'Гость', vip: 'Bronze', totalWins: 12450, biggest: 250000 };
     
-    // Фейковые игроки (реальные имена)
-    const fakePlayers = [
-      { name: 'Vladimir_K', win: 1850000 },
-      { name: 'LadyFortune', win: 1720000 },
-      { name: 'AceKing777', win: 1580000 },
-      { name: 'DiamondD', win: 1420000 },
-      { name: 'GoldDigger', win: 1290000 },
-      { name: 'LuckyStar', win: 1150000 },
-      { name: 'BigWinner', win: 980000 },
-      { name: 'CasinoPro', win: 870000 },
-    ];
+    // Генерация ДОХУЯ фейковых игроков (более 30)
+    const fakeFirstNames = ['Alex', 'Max', 'Dima', 'Vlad', 'Sergey', 'Ivan', 'Nikita', 'Artem', 'Pavel', 'Andrey', 'Mikhail', 'Oleg', 'Roman', 'Egor', 'Denis'];
+    const fakeLastNames = ['Volkov', 'Smirnov', 'Ivanov', 'Petrov', 'Sidorov', 'Kozlov', 'Morozov', 'Novikov', 'Fedorov', 'Mikhailov'];
+    const nickPrefixes = ['Lucky', 'Golden', 'Diamond', 'Ace', 'King', 'Queen', 'Jack', 'Star', 'Pro', 'Master', 'Lord', 'Baron', 'Sir', 'Mega', 'Ultra'];
+    
+    function generateFakePlayer() {
+      const useNick = Math.random() > 0.5;
+      let name;
+      if (useNick) {
+        const prefix = nickPrefixes[Math.floor(Math.random() * nickPrefixes.length)];
+        const suffix = Math.floor(Math.random() * 1000);
+        name = `${prefix}${suffix}`;
+      } else {
+        const first = fakeFirstNames[Math.floor(Math.random() * fakeFirstNames.length)];
+        const last = fakeLastNames[Math.floor(Math.random() * fakeLastNames.length)];
+        name = `${first}_${last}`;
+      }
+      const win = Math.floor(Math.random() * 2000000) + 500000;
+      return { name, win };
+    }
+    
+    let fakePlayers = [];
+    // Создаём 40 фейковых игроков
+    for (let i = 0; i < 40; i++) {
+      fakePlayers.push(generateFakePlayer());
+    }
+    // Добавим несколько фиксированных для узнаваемости
+    fakePlayers.push({ name: 'Vladimir_K', win: 1850000 });
+    fakePlayers.push({ name: 'LadyFortune', win: 1720000 });
+    fakePlayers.push({ name: 'AceKing777', win: 1580000 });
+    fakePlayers.push({ name: 'DiamondD', win: 1420000 });
+    fakePlayers.push({ name: 'GoldDigger', win: 1290000 });
     
     const SYMBOLS = ['7', '🍒', '🍋', '🍊', '💎', '🔔'];
     const PAYOUTS = { '7': 50, '🍒': 10, '🍋': 12, '🍊': 15, '💎': 30, '🔔': 20 };
@@ -437,13 +459,12 @@
     const vipStatusSpan = document.getElementById('vipStatus');
     const totalWinsSpan = document.getElementById('totalWins');
     const biggestWinSpan = document.getElementById('biggestWin');
-    const lastWinAmountSpan = document.getElementById('lastWinAmount');
+    const liveFeed = document.getElementById('liveFeed');
     
     // Вкладки
     const tabs = document.querySelectorAll('.tab-btn');
     const contents = document.querySelectorAll('.tab-content');
     
-    // Построение слотов
     function buildReels() {
       reelsContainer.innerHTML = '';
       for (let c=0; c<3; c++) {
@@ -471,7 +492,6 @@
         if (col!==undefined) cell.textContent = reels[col][row];
       });
       
-      // Обновить профиль
       currentUsernameSpan.textContent = currentUser.name;
       profileUsername.textContent = currentUser.name;
       vipStatusSpan.textContent = currentUser.vip;
@@ -481,16 +501,25 @@
       renderLeaderboard();
     }
     
-    // Рендер лидерборда + место игрока
     function renderLeaderboard() {
+      // Обновляем выигрыши фейковых игроков в реальном времени (имитация активности)
+      fakePlayers = fakePlayers.map(p => {
+        const increase = Math.floor(Math.random() * 15000) + 1000;
+        return { ...p, win: p.win + increase };
+      });
+      
       let sorted = [...fakePlayers].sort((a,b) => b.win - a.win);
-      // Вставить текущего игрока, если его нет
-      const userInList = sorted.find(p => p.name === currentUser.name);
-      if (!userInList && currentUser.name !== 'Гость') {
+      // Вставляем текущего пользователя
+      const userExists = sorted.find(p => p.name === currentUser.name);
+      if (!userExists && currentUser.name !== 'Гость') {
         sorted.push({ name: currentUser.name, win: currentUser.totalWins });
-        sorted.sort((a,b) => b.win - a.win);
+      } else if (userExists) {
+        userExists.win = currentUser.totalWins;
       }
-      leaderboardDiv.innerHTML = sorted.slice(0,6).map((p, idx) => {
+      sorted.sort((a,b) => b.win - a.win);
+      
+      // Показываем топ-8
+      leaderboardDiv.innerHTML = sorted.slice(0, 8).map((p, idx) => {
         const isUser = p.name === currentUser.name;
         return `<div class="leader-item ${isUser ? 'highlight-player' : ''}">
           <span class="player-name"><i class="fas fa-user"></i> ${p.name}</span>
@@ -501,10 +530,15 @@
       const rank = sorted.findIndex(p => p.name === currentUser.name) + 1;
       playerRankSpan.textContent = rank > 0 ? `#${rank}` : '—';
       
-      // Случайное обновление последнего выигрыша
-      if (Math.random() > 0.7) {
-        const fakeWin = Math.floor(Math.random() * 500000) + 50000;
-        lastWinAmountSpan.textContent = fakeWin.toLocaleString();
+      // Генерируем случайные сообщения в ленту
+      const messages = [
+        '🎰 BIG WIN! ', '💰 JACKPOT! ', '🔥 MEGA WIN! ', '💎 SUPER WIN! ', '🏆 GRAND! '
+      ];
+      if (Math.random() > 0.6) {
+        const randomPlayer = fakePlayers[Math.floor(Math.random() * fakePlayers.length)];
+        const amount = Math.floor(Math.random() * 800000) + 200000;
+        const msg = messages[Math.floor(Math.random() * messages.length)];
+        liveFeed.innerHTML = `${msg} ${randomPlayer.name} выиграл ${amount.toLocaleString()} ₽!`;
       }
     }
     
@@ -548,9 +582,9 @@
           currentUser.totalWins += winAmount;
           if (winAmount > currentUser.biggest) currentUser.biggest = winAmount;
           updateUI();
-          // Обновить лидерборд
-          const idx = fakePlayers.findIndex(p=>p.name===currentUser.name);
-          if(idx>=0) fakePlayers[idx].win = currentUser.totalWins;
+          // Обновить данные игрока в списке
+          const playerInFake = fakePlayers.find(p => p.name === currentUser.name);
+          if (playerInFake) playerInFake.win = currentUser.totalWins;
         }
       }, 70);
     }
@@ -574,47 +608,40 @@
     }));
     document.getElementById('playNowHome').addEventListener('click', ()=>document.querySelector('[data-tab="slots"]').click());
     
-    // Авторизация (реалистичная)
+    // Авторизация
     const modal = document.getElementById('authModal');
-    const loginBtn = document.getElementById('loginBtn');
-    const registerBtn = document.getElementById('registerBtn');
-    const closeModal = document.getElementById('closeModalBtn');
-    const submitLogin = document.getElementById('submitLogin');
-    const loginUsername = document.getElementById('loginUsername');
-    const logoutBtn = document.getElementById('logoutBtn');
-    
-    function openModal() { modal.style.display = 'flex'; }
-    loginBtn.addEventListener('click', openModal);
-    registerBtn.addEventListener('click', openModal);
-    closeModal.addEventListener('click', ()=> modal.style.display = 'none');
-    submitLogin.addEventListener('click', (e)=>{
+    document.getElementById('loginBtn').addEventListener('click', ()=> modal.style.display='flex');
+    document.getElementById('registerBtn').addEventListener('click', ()=> modal.style.display='flex');
+    document.getElementById('closeModalBtn').addEventListener('click', ()=> modal.style.display='none');
+    document.getElementById('submitLogin').addEventListener('click', (e)=>{
       e.preventDefault();
-      const newName = loginUsername.value.trim() || 'Player777';
+      const newName = document.getElementById('loginUsername').value.trim() || 'Player777';
       currentUser.name = newName;
       currentUser.vip = ['Bronze','Silver','Gold','Platinum'][Math.floor(Math.random()*4)];
-      // Добавить в лидерборд
       if (!fakePlayers.find(p=>p.name===newName)) fakePlayers.push({ name: newName, win: currentUser.totalWins });
       updateUI();
-      modal.style.display = 'none';
+      modal.style.display='none';
     });
-    logoutBtn.addEventListener('click', ()=>{
+    document.getElementById('logoutBtn').addEventListener('click', ()=>{
       currentUser = { name: 'Гость', vip: 'Bronze', totalWins: 12450, biggest: 250000 };
       updateUI();
     });
     
-    // Депозит (фейк)
     document.getElementById('depositBtn').addEventListener('click', ()=>{
       balance += 5000;
       updateUI();
     });
     
+    // Реальное время: обновление лидерборда и джекпота каждые 3 сек
+    setInterval(() => {
+      jackpot += Math.floor(Math.random()*15000)+5000;
+      renderLeaderboard();
+      updateUI();
+    }, 3000);
+    
     // Инициализация
     buildReels();
     updateUI();
-    setInterval(() => {
-      jackpot += Math.floor(Math.random()*5000)+1000;
-      updateUI();
-    }, 3000);
   })();
 </script>
 </body>

@@ -209,7 +209,6 @@
       overflow: hidden;
       white-space: nowrap;
     }
-    /* Чат */
     .chat-container {
       background: #0f0b14;
       border-radius: 32px;
@@ -456,48 +455,27 @@
 
 <script>
   (function(){
-    // ---------- ЗАГРУЗКА / СОХРАНЕНИЕ (localStorage) ----------
-    const STORAGE_KEY = 'casino777_save';
+    "use strict";
     
-    function saveState() {
-      const state = {
-        balance, jackpot, bet, freeSpins, multiplierActive,
-        currentUser, fakePlayers, chatMessages,
-        lastUpdate: Date.now()
-      };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    }
+    // ---------- ИСПРАВЛЕННАЯ ИНИЦИАЛИЗАЦИЯ И СОХРАНЕНИЕ ----------
+    const STORAGE_KEY = 'casino777_save_v3';
     
-    function loadState() {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        try {
-          const state = JSON.parse(saved);
-          balance = state.balance || 12450;
-          jackpot = state.jackpot || 8432150;
-          bet = state.bet || 10;
-          freeSpins = state.freeSpins || 0;
-          multiplierActive = state.multiplierActive || false;
-          currentUser = state.currentUser || { name: 'Гость', vip: 'Bronze', totalWins: 12450, biggest: 250000 };
-          fakePlayers = state.fakePlayers || generateFakePlayers(45);
-          chatMessages = state.chatMessages || generateInitialChatMessages();
-        } catch(e) { resetToDefault(); }
-      } else {
-        resetToDefault();
-      }
-    }
+    // Значения по умолчанию (гарантированно определены)
+    let balance = 12450;
+    let jackpot = 8432150;
+    let bet = 10;
+    let winAmount = 0;
+    let freeSpins = 0;
+    let multiplierActive = false;
+    let currentUser = { name: 'Гость', vip: 'Bronze', totalWins: 12450, biggest: 250000 };
+    let fakePlayers = [];
+    let chatMessages = [];
     
-    function resetToDefault() {
-      balance = 12450;
-      jackpot = 8432150;
-      bet = 10;
-      freeSpins = 0;
-      multiplierActive = false;
-      currentUser = { name: 'Гость', vip: 'Bronze', totalWins: 12450, biggest: 250000 };
-      fakePlayers = generateFakePlayers(45);
-      chatMessages = generateInitialChatMessages();
-    }
+    const SYMBOLS = ['7', '🍒', '🍋', '🍊', '💎', '🔔'];
+    const PAYOUTS = { '7': 50, '🍒': 10, '🍋': 12, '🍊': 15, '💎': 30, '🔔': 20 };
+    let reels = [['7','🍒','💎'],['🔔','7','🍋'],['🍊','💎','7']];
     
+    // Функции генерации фейковых данных
     function generateFakePlayers(count) {
       const fakeFirst = ['Alex', 'Max', 'Dima', 'Vlad', 'Sergey', 'Ivan', 'Nikita', 'Artem', 'Pavel', 'Andrey', 'Mikhail', 'Oleg', 'Roman', 'Egor', 'Denis'];
       const fakeLast = ['Volkov', 'Smirnov', 'Ivanov', 'Petrov', 'Sidorov', 'Kozlov', 'Morozov', 'Novikov', 'Fedorov', 'Mikhailov'];
@@ -527,17 +505,48 @@
       ];
     }
     
-    // ---------- ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ----------
-    let balance, jackpot, bet, winAmount = 0, freeSpins, multiplierActive;
-    let currentUser;
-    let fakePlayers = [];
-    let chatMessages = [];
+    // Безопасная загрузка из localStorage
+    function loadState() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const state = JSON.parse(saved);
+          balance = (typeof state.balance === 'number') ? state.balance : 12450;
+          jackpot = (typeof state.jackpot === 'number') ? state.jackpot : 8432150;
+          bet = (typeof state.bet === 'number') ? state.bet : 10;
+          freeSpins = (typeof state.freeSpins === 'number') ? state.freeSpins : 0;
+          multiplierActive = (typeof state.multiplierActive === 'boolean') ? state.multiplierActive : false;
+          currentUser = state.currentUser || { name: 'Гость', vip: 'Bronze', totalWins: 12450, biggest: 250000 };
+          fakePlayers = (Array.isArray(state.fakePlayers) && state.fakePlayers.length) ? state.fakePlayers : generateFakePlayers(45);
+          chatMessages = (Array.isArray(state.chatMessages) && state.chatMessages.length) ? state.chatMessages : generateInitialChatMessages();
+        } else {
+          resetToDefault();
+        }
+      } catch (e) {
+        console.warn('Ошибка загрузки, сброс к значениям по умолчанию');
+        resetToDefault();
+      }
+    }
     
-    const SYMBOLS = ['7', '🍒', '🍋', '🍊', '💎', '🔔'];
-    const PAYOUTS = { '7': 50, '🍒': 10, '🍋': 12, '🍊': 15, '💎': 30, '🔔': 20 };
-    let reels = [['7','🍒','💎'],['🔔','7','🍋'],['🍊','💎','7']];
+    function resetToDefault() {
+      balance = 12450;
+      jackpot = 8432150;
+      bet = 10;
+      freeSpins = 0;
+      multiplierActive = false;
+      currentUser = { name: 'Гость', vip: 'Bronze', totalWins: 12450, biggest: 250000 };
+      fakePlayers = generateFakePlayers(45);
+      chatMessages = generateInitialChatMessages();
+    }
     
-    // DOM
+    function saveState() {
+      try {
+        const state = { balance, jackpot, bet, freeSpins, multiplierActive, currentUser, fakePlayers, chatMessages };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch(e) {}
+    }
+    
+    // DOM элементы
     const mainBalanceSpan = document.getElementById('mainBalance');
     const homeJackpot = document.getElementById('homeJackpot');
     const reelsContainer = document.getElementById('reelsContainer');
@@ -555,11 +564,10 @@
     const liveFeed = document.getElementById('liveFeed');
     const chatMessagesDiv = document.getElementById('chatMessages');
     
-    // Вкладки
     const tabs = document.querySelectorAll('.tab-btn');
     const contents = document.querySelectorAll('.tab-content');
     
-    // Загрузка сохранения
+    // Инициализация: сначала загружаем состояние, потом строим интерфейс
     loadState();
     
     function buildReels() {
@@ -577,33 +585,34 @@
     }
     
     function updateUI() {
+      if (typeof balance !== 'number') balance = 12450;
+      if (typeof jackpot !== 'number') jackpot = 8432150;
+      
       mainBalanceSpan.textContent = balance.toLocaleString();
       homeJackpot.textContent = jackpot.toLocaleString();
       betValueSpan.textContent = bet;
-      slotWinSpan.textContent = winAmount.toLocaleString();
+      slotWinSpan.textContent = (winAmount || 0).toLocaleString();
       freeSpinsSpan.textContent = freeSpins;
       multSpan.textContent = multiplierActive ? 'x2' : 'x1';
       
       document.querySelectorAll('.slot-cell').forEach(cell => {
         const col = cell.dataset.col, row = cell.dataset.row;
-        if (col!==undefined) cell.textContent = reels[col][row];
+        if (col !== undefined && reels[col] && reels[col][row]) cell.textContent = reels[col][row];
       });
       
-      currentUsernameSpan.textContent = currentUser.name;
-      profileUsername.textContent = currentUser.name;
-      vipStatusSpan.textContent = currentUser.vip;
-      totalWinsSpan.textContent = currentUser.totalWins.toLocaleString();
-      biggestWinSpan.textContent = currentUser.biggestWin.toLocaleString();
+      currentUsernameSpan.textContent = currentUser.name || 'Гость';
+      profileUsername.textContent = currentUser.name || 'Гость';
+      vipStatusSpan.textContent = currentUser.vip || 'Bronze';
+      totalWinsSpan.textContent = (currentUser.totalWins || 0).toLocaleString();
+      biggestWinSpan.textContent = (currentUser.biggest || 0).toLocaleString();
       
       renderLeaderboard();
       renderChat();
-      saveState(); // Автосохранение при каждом обновлении UI
+      saveState();
     }
     
     function renderLeaderboard() {
-      // Обновляем выигрыши фейковых игроков в реальном времени
       fakePlayers = fakePlayers.map(p => ({ ...p, win: p.win + Math.floor(Math.random()*15000)+1000 }));
-      
       let sorted = [...fakePlayers].sort((a,b) => b.win - a.win);
       const userExists = sorted.find(p => p.name === currentUser.name);
       if (!userExists && currentUser.name !== 'Гость') {
@@ -613,7 +622,7 @@
       }
       sorted.sort((a,b) => b.win - a.win);
       
-      leaderboardDiv.innerHTML = sorted.slice(0, 8).map((p, idx) => {
+      leaderboardDiv.innerHTML = sorted.slice(0, 8).map((p) => {
         const isUser = p.name === currentUser.name;
         return `<div class="leader-item ${isUser ? 'highlight-player' : ''}">
           <span class="player-name"><i class="fas fa-user"></i> ${p.name}</span>
@@ -649,7 +658,6 @@
       saveState();
     }
     
-    // Генерация фейковых сообщений в чат
     function generateFakeChatMessage() {
       const fakeUser = fakePlayers[Math.floor(Math.random()*fakePlayers.length)].name;
       const phrases = [
@@ -708,7 +716,7 @@
       }, 70);
     }
     
-    // Обработчики
+    // Обработчики событий
     document.getElementById('spinMain').addEventListener('click', spin);
     document.getElementById('decreaseBet').addEventListener('click', ()=>{ if(bet>5) bet-=5; updateUI(); });
     document.getElementById('increaseBet').addEventListener('click', ()=>{ if(bet<500) bet+=5; updateUI(); });
@@ -766,11 +774,11 @@
       updateUI();
     });
     
-    // Инициализация
+    // Инициализация отображения
     buildReels();
     updateUI();
     
-    // Интервалы для реального времени
+    // Интервалы реального времени
     setInterval(() => {
       jackpot += Math.floor(Math.random()*15000)+5000;
       renderLeaderboard();
@@ -779,7 +787,6 @@
     }, 4000);
     
     setInterval(() => {
-      // Фейковые сообщения почаще
       if (Math.random() > 0.5) generateFakeChatMessage();
     }, 8000);
     
